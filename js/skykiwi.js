@@ -11,11 +11,11 @@ var skykiwi = {
 			skykiwi.showOptions.init();
 			$("input[type=button]").button();
 		},
-		getParameterByName: function( name ){
+		getParameterByName: function( url,  name ){
 			name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
 			var regexS = "[\\?&]" + name + "=([^&#]*)";
 			var regex = new RegExp(regexS);
-			var results = regex.exec(window.location.search);
+			var results = regex.exec(url);
 			if(results == null){
 				return "";
 			}else{
@@ -37,8 +37,40 @@ var skykiwi = {
 				skykiwi.start.getRightForum();
 				$(this).removeClass("btn_start").addClass("btn_stop").val("Stop");
 				$("#header_panel").addClass("monitoring");
+				var uid = skykiwi.start.getUserUID();
+				var uid = "338977";
+				
+				if ( !uid ){
+					alert("Please Login First!");
+					return false;
+				}else{
+					var href = new Array();
+					var i = skykiwi.options.total_topic;
+					$('tbody[id^="normalthread_"]').each(function(){
+						var user_href = $(this).find(".by:first").find("cite a").attr("href");
+						var user_uid = skykiwi.global.getParameterByName( user_href, "uid");
+						if ( user_uid == uid && i > 0 ){
+							i--;
+							href[i] = $(this).find(".xst").attr("href");
+						}
+					});
+					
+					
+				}
+				
+
+				
 				skykiwi.start.stopAction();
 			});
+		},
+		getUserUID: function(){
+			var href = $(".vwmy a").attr("href");
+			var uid = skykiwi.global.getParameterByName( href, "uid");
+			return uid;
+		},
+		getUsername: function(){
+			var username = $(".vwmy").text();
+			return username;
 		},
 		stopAction: function(){
 			$(".btn_stop").click(function(){
@@ -58,7 +90,7 @@ var skykiwi = {
 			localStorage.setItem( "options",  JSON.stringify(skykiwi.options));
 		},
 		getRightForum: function(){
-			var forumid = skykiwi.global.getParameterByName("fid");
+			var forumid = skykiwi.global.getParameterByName( window.location.search, "fid");
 			if ( forumid != skykiwi.options.forum_id ){
 				window.location.href = "forum.php?mod=forumdisplay&fid="+skykiwi.options.forum_id;
 			}else{
